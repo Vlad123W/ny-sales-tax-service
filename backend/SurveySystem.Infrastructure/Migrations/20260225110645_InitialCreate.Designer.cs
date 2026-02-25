@@ -13,7 +13,7 @@ using SurveySystem.Infrastructure.Persistance;
 namespace SurveySystem.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260225103353_InitialCreate")]
+    [Migration("20260225110645_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
