@@ -3,6 +3,7 @@ using CsvHelper.Configuration;
 using SurveySystem.Application.DTOs;
 using SurveySystem.Application.Interfaces;
 using System.Globalization;
+using System.Net.Security;
 
 namespace SurveySystem.Infrastructure.Services
 {
@@ -10,18 +11,17 @@ namespace SurveySystem.Infrastructure.Services
     {
         public IEnumerable<CsvOrderDto> ParseOrders(Stream fileStream)
         {
+            using var reader = new StreamReader(fileStream);
+
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                HasHeaderRecord = true, 
+                HasHeaderRecord = true,
                 MissingFieldFound = null, 
-                HeaderValidated = null   
             };
 
-            using var reader = new StreamReader(fileStream);
             using var csv = new CsvReader(reader, config);
 
             var records = csv.GetRecords<CsvOrderDto>().ToList();
-
             return records;
         }
     }

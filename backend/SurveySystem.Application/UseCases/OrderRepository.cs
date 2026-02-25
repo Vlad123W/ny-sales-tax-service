@@ -30,7 +30,7 @@ namespace SurveySystem.Application.UseCases
 
             foreach (var record in csvRecords)
             {
-                var order = new Order(record.Id, record.Latitude, record.Longitude, record.Subtotal, record.Timestamp);
+                var order = new Order(Convert.ToInt32(record.Id), record.Latitude, record.Longitude, record.Subtotal, record.Timestamp);
 
                 var (CompositeRate, Breakdown, Jurisdictions) = await _taxService.CalculateTaxAsync(record.Latitude, record.Longitude, cancellationToken);
 

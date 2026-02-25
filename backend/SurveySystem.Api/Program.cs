@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using SurveySystem.Application;
 using SurveySystem.Infrastructure;
+using SurveySystem.Infrastructure.Persistance;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +33,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
 }
 
 app.UseHttpsRedirection();

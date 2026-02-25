@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: surveysystem_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    
+      POSTGRES_DB: survey_db 
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: . 
+      dockerfile: SurveySystem.Api/Dockerfile
+    container_name: surveysystem_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=survey_db;Username=postgres;Password=12345"
+      ASPNETCORE_ENVIRONMENT: "Development"
+
+volumes:
+  postgres_data:
