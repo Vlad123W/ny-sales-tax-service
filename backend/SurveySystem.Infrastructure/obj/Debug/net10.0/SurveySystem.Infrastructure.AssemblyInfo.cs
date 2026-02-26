@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SurveySystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+384042c5ded609cd2cf528c725fe68187eddda5d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ca687910d081aa0f2e0773accd5c3ad717e5527")]
 [assembly: System.Reflection.AssemblyProductAttribute("SurveySystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SurveySystem.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
