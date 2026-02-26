@@ -55,9 +55,9 @@ namespace SurveySystem.Application.UseCases
             return MapToResponse(order);
         }
 
-        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetOrdersAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        public async Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetOrdersAsync(OrderFilterParameters filters, CancellationToken cancellationToken = default)
         {
-            var (orders, totalCount) = await _orderService.GetPagedAsync(page, pageSize, cancellationToken);
+            var (orders, totalCount) = await _orderService.GetPagedAsync(filters, cancellationToken);
 
             var dtoList = orders.Select(MapToResponse).ToList();
 

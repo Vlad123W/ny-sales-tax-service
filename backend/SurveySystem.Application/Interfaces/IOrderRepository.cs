@@ -9,6 +9,6 @@ namespace SurveySystem.Application.Interfaces
     {
         Task ImportFromCsvAsync(Stream csvStream, CancellationToken cancellationToken = default);
         Task<OrderResponseDto> CreateOrderAsync(double latitude, double longitude, decimal subtotal, CancellationToken cancellationToken = default);
-        Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetOrdersAsync(int page, int pageSize, CancellationToken cancellationToken = default);
+        Task<(IEnumerable<OrderResponseDto> Items, int TotalCount)> GetOrdersAsync(OrderFilterParameters filters, CancellationToken cancellationToken = default);
     }
 }
