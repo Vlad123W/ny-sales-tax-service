@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SurveySystem.Application.DTOs;
 using SurveySystem.Application.Interfaces;
 using SurveySystem.Domain.Entities;
 using SurveySystem.Infrastructure.Persistance;
@@ -22,18 +23,29 @@ namespace SurveySystem.Infrastructure.Services
         }
 
         public async Task<(IEnumerable<Order> Items, int TotalCount)> GetPagedAsync(
-            int page,
-            int pageSize,
+            OrderFilterParameters filters,
             CancellationToken cancellationToken = default)
         {
             var query = _context.Orders.AsNoTracking();
+            
+            if (filters.StartDate.HasValue)
+                query = query.Where(o => o.Timestamp >= filters.StartDate.Value.ToUniversalTime());
+
+            if (filters.EndDate.HasValue)
+                query = query.Where(o => o.Timestamp <= filters.EndDate.Value.ToUniversalTime());
+
+            if (filters.MinTotalAmount.HasValue)
+                query = query.Where(o => o.TotalAmount >= filters.MinTotalAmount.Value);
+
+            if (filters.MaxTotalAmount.HasValue)
+                query = query.Where(o => o.TotalAmount <= filters.MaxTotalAmount.Value);
 
             var totalCount = await query.CountAsync(cancellationToken);
 
             var items = await query
                 .OrderByDescending(o => o.Timestamp)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((filters.Page - 1) * filters.PageSize)
+                .Take(filters.PageSize)
                 .ToListAsync(cancellationToken);
 
             return (items, totalCount);

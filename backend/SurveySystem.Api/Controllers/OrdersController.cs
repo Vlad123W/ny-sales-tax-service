@@ -60,23 +60,21 @@ namespace SurveySystem.Controllers
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetOrders(
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 50,
+            [FromQuery]OrderFilterParameters filters,
             CancellationToken cancellationToken = default)
         {
-            if (page < 1 || pageSize < 1)
+            if (filters.Page < 1 || filters.PageSize < 1)
             {
                 return BadRequest(new { Error = "Параметри пагінації (page та pageSize) повинні бути більшими за 0." });
             }
 
-            var (items, totalCount) = await _orderRepository.GetOrdersAsync(page, pageSize, cancellationToken);
+            var (items, totalCount) = await _orderRepository.GetOrdersAsync(filters, cancellationToken);
 
             var response = new
             {
                 TotalCount = totalCount,
-                Page = page,
-                PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize),
+                filters,
+                TotalPages = (int)Math.Ceiling((double)totalCount / filters.PageSize),
                 Items = items
             };
 
