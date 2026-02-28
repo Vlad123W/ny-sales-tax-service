@@ -54,7 +54,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred while migrating the database.");
     }
 }
-app.UseCors("AllowReactApp");
+
 app.MapControllers();
 
 app.Run();
