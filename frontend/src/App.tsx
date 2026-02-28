@@ -1,24 +1,42 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { apiClient } from './api';
 import { 
   Table, TableBody, TableCell, TableHead, TableRow, 
-  Button, TextField, Paper, Typography, Box 
+  Button, TextField, Paper, Typography, Box, TablePagination 
 } from '@mui/material';
 
 export default function App() {
   const [orders, setOrders] = useState<any[]>([]);
   const [formData, setFormData] = useState({ lat: '', lon: '', subtotal: '' });
+  
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchOrders = useCallback(() => {
-    apiClient.get('/orders?page=1&pageSize=50')
-      .then(res => setOrders(res.data.items || []))
+    apiClient.get('/orders?page=1&pageSize=1000') 
+      .then(res => setOrders(res.data.items || res.data || []))
       .catch(err => console.error("Помилка завантаження:", err));
   }, []);
 
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
+
+  
+  const filteredOrders = useMemo(() => {
+    return orders.filter((o: any) => 
+      o.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.jurisdictions?.join(' ').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [orders, searchTerm]);
+
+
+  const currentTableData = useMemo(() => {
+    const start = page * rowsPerPage;
+    return filteredOrders.slice(start, start + rowsPerPage);
+  }, [filteredOrders, page, rowsPerPage]);
 
   const handleManualCreate = async (e: any) => {
     e.preventDefault();
@@ -55,24 +73,20 @@ export default function App() {
   return (
     <Box sx={{ p: 4, backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-        BetterMe: Адмін-панель податків
+        ByteStorm : Адмін-панель податків
       </Typography>
 
-      {/* Заміна Grid на Flexbox */}
       <Box sx={{ display: 'flex', gap: 3, mb: 4, flexWrap: 'wrap' }}>
-        
-        {/* Форма створення */}
         <Paper sx={{ p: 3, flex: 1, minWidth: '350px' }}>
           <Typography variant="h6" gutterBottom>Створити замовлення вручну</Typography>
           <form onSubmit={handleManualCreate} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <TextField label="Latitude" value={formData.lat} onChange={(e: any) => setFormData({...formData, lat: e.target.value})} required />
-            <TextField label="Longitude" value={formData.lon} onChange={(e: any) => setFormData({...formData, lon: e.target.value})} required />
-            <TextField label="Subtotal" type="number" value={formData.subtotal} onChange={(e: any) => setFormData({...formData, subtotal: e.target.value})} required />
+            <TextField label="Latitude" value={formData.lat} onChange={(e: any) => setFormData({...formData, lat: e.target.value})} required size="small" />
+            <TextField label="Longitude" value={formData.lon} onChange={(e: any) => setFormData({...formData, lon: e.target.value})} required size="small" />
+            <TextField label="Subtotal" type="number" value={formData.subtotal} onChange={(e: any) => setFormData({...formData, subtotal: e.target.value})} required size="small" />
             <Button type="submit" variant="contained">РОЗРАХУВАТИ ТА ЗБЕРЕГТИ</Button>
           </form>
         </Paper>
 
-        {/* Завантаження CSV */}
         <Paper {...getRootProps()} sx={{ 
           p: 3, border: '2px dashed #1976d2', flex: 1, minWidth: '300px',
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' 
@@ -82,9 +96,19 @@ export default function App() {
         </Paper>
       </Box>
 
-      {/* Таблиця */}
       <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>Список замовлень</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="h6">Список замовлень</Typography>
+          <TextField 
+            label="Пошук за ID або Юрисдикцією" 
+            variant="outlined" 
+            size="small" 
+            sx={{ width: '300px' }}
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
+          />
+        </Box>
+
         <Table size="small">
           <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
             <TableRow>
@@ -97,7 +121,7 @@ export default function App() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((o: any) => (
+            {currentTableData.map((o: any) => (
               <TableRow key={o.id}>
                 <TableCell sx={{ fontSize: '0.75rem' }}>{o.id?.substring(0, 8)}...</TableCell>
                 <TableCell>${o.subtotal?.toFixed(2)}</TableCell>
@@ -109,6 +133,19 @@ export default function App() {
             ))}
           </TableBody>
         </Table>
+
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={filteredOrders.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
+        />
       </Paper>
     </Box>
   );
