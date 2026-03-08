@@ -31,14 +31,10 @@ namespace SurveySystem.Application.UseCases
             foreach (var record in csvRecords)
             {
                 var order = new Order(Convert.ToInt32(record.Id), record.Latitude, record.Longitude, record.Subtotal, record.Timestamp);
-
-                var (CompositeRate, Breakdown, Jurisdictions) = await _taxService.CalculateTaxAsync(record.Latitude, record.Longitude, cancellationToken);
-
-                order.ApplyTax(CompositeRate, Breakdown, Jurisdictions);
-
                 ordersToSave.Add(order);
             }
 
+            await _taxService.CalculateTaxAsync(ordersToSave, cancellationToken);
             await _orderService.AddRangeAsync(ordersToSave, cancellationToken);
         }
 
@@ -74,6 +70,7 @@ namespace SurveySystem.Application.UseCases
                 CompositeTaxRate = order.CompositeTaxRate,
                 TaxAmount = order.TaxAmount,
                 TotalAmount = order.TotalAmount,
+                Timestamp = order.Timestamp,
                 Breakdown = order.Breakdown,
                 Jurisdictions = order.Jurisdictions
             };
