@@ -27,7 +27,7 @@ namespace SurveySystem.Infrastructure.Services
 
             if (!matchedZones.Any())
             {
-                return (0.04m, new TaxBreakdown(0.04m, 0, 0, 0), new List<string> { "New York State" });
+                return (0.04m, new TaxBreakdown(0.04m, 0, 0, 0), new List<string> { "Other state" });
             }
 
             var stateRate = matchedZones.Max(z => z.StateRate); 
@@ -74,7 +74,7 @@ namespace SurveySystem.Infrastructure.Services
                     SUM(z.""SpecialRates"") AS special_rates,
                     array_agg(z.""Name"") AS jurisdictions
                 FROM input_data i
-                JOIN ""TaxZones"" z 
+                INNER JOIN ""TaxZones"" z 
                   ON ST_Contains(z.""Boundary"", ST_SetSRID(ST_MakePoint(i.""Longitude"", i.""Latitude""), 4326))
                 GROUP BY i.""OrderId""
             )

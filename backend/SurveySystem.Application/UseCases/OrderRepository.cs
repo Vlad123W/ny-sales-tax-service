@@ -34,8 +34,9 @@ namespace SurveySystem.Application.UseCases
                 ordersToSave.Add(order);
             }
 
-            await _taxService.CalculateTaxAsync(ordersToSave, cancellationToken);
-            await _orderService.AddRangeAsync(ordersToSave, cancellationToken);
+            var validNyOrders = await _taxService.CalculateTaxAsync(ordersToSave, cancellationToken);
+
+            await _orderService.AddRangeAsync(validNyOrders, cancellationToken);
         }
 
         public async Task<OrderResponseDto> CreateOrderAsync(double latitude, double longitude, decimal subtotal, CancellationToken cancellationToken = default)
