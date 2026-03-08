@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.BulkExtensions;
+using Microsoft.EntityFrameworkCore;
 using SurveySystem.Application.DTOs;
 using SurveySystem.Application.Interfaces;
 using SurveySystem.Domain.Entities;
@@ -18,8 +19,10 @@ namespace SurveySystem.Infrastructure.Services
 
         public async Task AddRangeAsync(IEnumerable<Order> orders, CancellationToken cancellationToken = default)
         {
-            await _context.Orders.AddRangeAsync(orders, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            var ordersList = orders.ToList();
+            if (ordersList.Count == 0) return;
+
+            await _context.BulkInsertAsync(ordersList, cancellationToken: cancellationToken);
         }
 
         public async Task<(IEnumerable<Order> Items, int TotalCount)> GetPagedAsync(

@@ -50,7 +50,7 @@ namespace SurveySystem.Controllers
                 request.Longitude,
                 request.Subtotal,
                 cancellationToken);
-
+            
             return CreatedAtAction(nameof(GetOrders), new { id = responseDto.Id }, responseDto);
         }
 
@@ -63,6 +63,7 @@ namespace SurveySystem.Controllers
             [FromQuery]OrderFilterParameters filters,
             CancellationToken cancellationToken = default)
         {
+            
             if (filters.Page < 1 || filters.PageSize < 1)
             {
                 return BadRequest(new { Error = "Параметри пагінації (page та pageSize) повинні бути більшими за 0." });
